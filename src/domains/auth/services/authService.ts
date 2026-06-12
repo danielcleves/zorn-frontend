@@ -1,5 +1,5 @@
 import api from '@/lib/axios'
-import type { AuthResponse, LoginCredentials } from '../types'
+import type { AuthResponse, LoginCredentials, RegisterCredentials } from '../types'
 
 export const login = async (
   data: LoginCredentials
@@ -9,7 +9,7 @@ export const login = async (
 }
 
 export const register = async (
-  data: LoginCredentials
+  data: RegisterCredentials
 ): Promise<AuthResponse> => {
   const res = await api.post<AuthResponse>('/register', data)
   return res.data
