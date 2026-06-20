@@ -1,17 +1,16 @@
-import { useMutation } from '@tanstack/vue-query'
-import { login, getCurrentUser } from '../services/authService'
+import { useMutation, useQueryClient } from '@tanstack/vue-query'
+import { login } from '../services/authService'
 import { useAuthStore } from '../store/authStore'
 
 export const useLogin = () => {
   const auth = useAuthStore()
+  const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: login,
-    onSuccess: async (data) => {
+    onSuccess: (data) => {
       auth.setToken(data.access_token)
-
-      const user = await getCurrentUser()
-      auth.setUser(user)
+      queryClient.invalidateQueries({ queryKey: ['me'] })
     }
   })
 }
