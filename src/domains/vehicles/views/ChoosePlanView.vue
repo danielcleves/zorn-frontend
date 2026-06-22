@@ -24,8 +24,8 @@ const { isPending: createPending } = createPlanMutation
 const mode = ref<'choose' | 'create'>('choose')
 const selectedPlanId = ref<number | null>(null)
 const selectedSourceVehicleId = ref<number | null>(null)
-const customTasks = ref<{ name: string; description: string; frequency_km: number | null; frequency_time_months: number | null }[]>(
-  [{ name: '', description: '', frequency_km: null, frequency_time_months: null }]
+const customTasks = ref<{ name: string; description: string; frequency_km: number | null; frequency_time_months: number | null; review_frequency_km: number | null; review_frequency_time_months: number | null }[]>(
+  [{ name: '', description: '', frequency_km: null, frequency_time_months: null, review_frequency_km: null, review_frequency_time_months: null }]
 )
 
 const otherVehicles = computed(() =>
@@ -42,7 +42,7 @@ const { defineField, errors, handleSubmit } = useForm<{ name: string }>({
 const [planName] = defineField('name')
 
 const addTask = () => {
-  customTasks.value.push({ name: '', description: '', frequency_km: null, frequency_time_months: null })
+  customTasks.value.push({ name: '', description: '', frequency_km: null, frequency_time_months: null, review_frequency_km: null, review_frequency_time_months: null })
 }
 
 const removeTask = (index: number) => {
@@ -74,6 +74,8 @@ const handleCreateAndAssign = handleSubmit(async () => {
       description: t.description || undefined,
       frequency_km: t.frequency_km ?? undefined,
       frequency_time_months: t.frequency_time_months ?? undefined,
+      review_frequency_km: t.review_frequency_km ?? undefined,
+      review_frequency_time_months: t.review_frequency_time_months ?? undefined,
     })),
   })
   await assignMutation.mutateAsync({ vehicleId, planId: plan.id })
@@ -122,6 +124,8 @@ const skip = () => {
                 <div class="text-right text-xs text-gray-500 ml-4 whitespace-nowrap">
                   <span v-if="task.frequency_km" class="block">Cada {{ displayUnit(task.frequency_km) }}</span>
                   <span v-if="task.frequency_time_months" class="block">Cada {{ task.frequency_time_months }} meses</span>
+                  <span v-if="task.review_frequency_km" class="block text-blue-600">Rev: cada {{ displayUnit(task.review_frequency_km) }}</span>
+                  <span v-if="task.review_frequency_time_months" class="block text-blue-600">Rev: cada {{ task.review_frequency_time_months }} meses</span>
                 </div>
               </div>
             </div>
@@ -174,13 +178,25 @@ const skip = () => {
         </div>
         <div class="flex gap-4">
           <div class="flex-1">
-            <label class="block mb-1.5 font-medium text-sm text-gray-700">Frequency ({{ unit }})</label>
+            <label class="block mb-1.5 font-medium text-sm text-gray-700">Maint. Frequency ({{ unit }})</label>
             <input v-model.number="task.frequency_km" type="number" min="0" placeholder="e.g., 10000"
               class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-[#1a1a2e] box-border" />
           </div>
           <div class="flex-1">
-            <label class="block mb-1.5 font-medium text-sm text-gray-700">Frequency (months)</label>
+            <label class="block mb-1.5 font-medium text-sm text-gray-700">Maint. Frequency (months)</label>
             <input v-model.number="task.frequency_time_months" type="number" min="0" placeholder="e.g., 12"
+              class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-[#1a1a2e] box-border" />
+          </div>
+        </div>
+        <div class="flex gap-4 mt-4">
+          <div class="flex-1">
+            <label class="block mb-1.5 font-medium text-sm text-gray-700">Review Frequency ({{ unit }})</label>
+            <input v-model.number="task.review_frequency_km" type="number" min="0" placeholder="e.g., 5000"
+              class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-[#1a1a2e] box-border" />
+          </div>
+          <div class="flex-1">
+            <label class="block mb-1.5 font-medium text-sm text-gray-700">Review Frequency (months)</label>
+            <input v-model.number="task.review_frequency_time_months" type="number" min="0" placeholder="e.g., 6"
               class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-[#1a1a2e] box-border" />
           </div>
         </div>

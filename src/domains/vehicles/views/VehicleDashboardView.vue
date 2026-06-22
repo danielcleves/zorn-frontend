@@ -54,7 +54,7 @@ const cancelEditing = () => {
 }
 
 const addTask = () => {
-  editTasks.value.push({ name: '', description: '', frequency_km: null, frequency_time_months: null, is_active: true, _new: true })
+  editTasks.value.push({ name: '', description: '', frequency_km: null, frequency_time_months: null, review_frequency_km: null, review_frequency_time_months: null, is_active: true, _new: true })
 }
 
 const removeEditTask = (index: number) => {
@@ -70,6 +70,8 @@ const saveTasks = async () => {
     description: t.description ?? null,
     frequency_km: t.frequency_km ?? null,
     frequency_time_months: t.frequency_time_months ?? null,
+    review_frequency_km: t.review_frequency_km ?? null,
+    review_frequency_time_months: t.review_frequency_time_months ?? null,
     is_active: t.is_active ?? true,
   }))
   await syncMutation.mutateAsync({ planId, tasks })
@@ -197,6 +199,12 @@ const friendlyTime = (days: number): string => {
               <span v-if="task.frequency_km" class="block text-gray-500">Every {{ displayUnit(task.frequency_km) }}</span>
               <span v-if="task.frequency_time_months" class="block text-gray-500">{{ task.frequency_time_months }} months</span>
             </template>
+            <template v-if="task.next_review && (task.next_review.next_due_km !== null || task.next_review.next_due_date !== null)">
+              <span class="block text-xs text-blue-600 mt-1">🔍 Review:
+                <template v-if="task.next_review.remaining_km !== null">{{ displayUnit(task.next_review.remaining_km) }} left</template>
+                <template v-if="task.next_review.remaining_days !== null">{{ friendlyTime(task.next_review.remaining_days) }} left</template>
+              </span>
+            </template>
           </div>
         </div>
       </div>
@@ -220,13 +228,25 @@ const friendlyTime = (days: number): string => {
           </div>
           <div class="flex gap-3">
             <div class="flex-1">
-              <label class="block mb-1 font-medium text-xs text-gray-700">Frequency ({{ unit }})</label>
+              <label class="block mb-1 font-medium text-xs text-gray-700">Maint. Frequency ({{ unit }})</label>
               <input v-model.number="task.frequency_km" type="number" min="0" placeholder="e.g., 10000"
                 class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-[#1a1a2e] box-border" />
             </div>
             <div class="flex-1">
-              <label class="block mb-1 font-medium text-xs text-gray-700">Frequency (months)</label>
+              <label class="block mb-1 font-medium text-xs text-gray-700">Maint. Frequency (months)</label>
               <input v-model.number="task.frequency_time_months" type="number" min="0" placeholder="e.g., 12"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-[#1a1a2e] box-border" />
+            </div>
+          </div>
+          <div class="flex gap-3 mt-3">
+            <div class="flex-1">
+              <label class="block mb-1 font-medium text-xs text-gray-700">Review Frequency ({{ unit }})</label>
+              <input v-model.number="task.review_frequency_km" type="number" min="0" placeholder="e.g., 5000"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-[#1a1a2e] box-border" />
+            </div>
+            <div class="flex-1">
+              <label class="block mb-1 font-medium text-xs text-gray-700">Review Frequency (months)</label>
+              <input v-model.number="task.review_frequency_time_months" type="number" min="0" placeholder="e.g., 6"
                 class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-[#1a1a2e] box-border" />
             </div>
           </div>
