@@ -19,7 +19,6 @@ export const addVehicleSchema = yup.object({
 })
 
 export const addMaintenanceSchema = yup.object({
-  task_name: yup.string().required('Task name is required'),
   date: yup.string().required('Date is required'),
   mileage: yup
     .number()
@@ -33,6 +32,7 @@ export const addMaintenanceSchema = yup.object({
     .nullable()
     .transform((val) => (val === '' ? null : val)),
   notes: yup.string().notRequired(),
+  is_review_only: yup.boolean().notRequired(),
 })
 
 export const updateMileageSchema = yup.object({
@@ -56,6 +56,18 @@ export const createPlanSchema = yup.object({
         .nullable()
         .transform((val) => (val === '' ? null : val)),
       frequency_time_months: yup
+        .number()
+        .typeError('Must be a number')
+        .min(0, 'Cannot be negative')
+        .nullable()
+        .transform((val) => (val === '' ? null : val)),
+      review_frequency_km: yup
+        .number()
+        .typeError('Must be a number')
+        .min(0, 'Cannot be negative')
+        .nullable()
+        .transform((val) => (val === '' ? null : val)),
+      review_frequency_time_months: yup
         .number()
         .typeError('Must be a number')
         .min(0, 'Cannot be negative')
